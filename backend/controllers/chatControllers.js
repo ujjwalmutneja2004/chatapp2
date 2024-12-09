@@ -1,7 +1,10 @@
 const asyncHandler=require("express-async-handler")
 const Chat = require("../models/chatModel");
 const User = require("../models/userModel");
+const axios = require('axios');
 
+
+//one to one chat
 const accessChat = asyncHandler(async (req, res) => {
     const { userId } = req.body;
 
@@ -15,6 +18,7 @@ const accessChat = asyncHandler(async (req, res) => {
         isGroupChat: false,
         $and: [
         //current user logged in and the user id that we are provided with
+        //see req contain logged in user so req.user id means logged in user
             { users: { $elemMatch: { $eq: req.user._id } } },
             { users: { $elemMatch: { $eq: userId } } },
         ],
@@ -28,6 +32,7 @@ const accessChat = asyncHandler(async (req, res) => {
         select: "name pic email",
     });
 
+    //one chat can exists once only in mychat section soischat[0]
     if (isChat.length > 0) {
         res.send(isChat[0]);
     } else {
@@ -35,6 +40,7 @@ const accessChat = asyncHandler(async (req, res) => {
         var chatData = {
             chatName: "sender",
             isGroupChat: false,
+            //user logged in and user with which we are trying to create chat
             users: [req.user._id, userId],
         };
 
@@ -54,67 +60,140 @@ const accessChat = asyncHandler(async (req, res) => {
 });
 
 
+
+ // Fetch all chats where this user is involved
 const fetchChats = asyncHandler(async (req, res) => {
     try {
-      Chat.find({ users: { $elemMatch: { $eq: req.user._id } } })
-        .populate("users", "-password")
-        .populate("groupAdmin", "-password")
-        .populate("latestMessage")
-        .sort({ updatedAt: -1 })
-        .then(async (results) => {
-          results = await User.populate(results, {
+       
+        //as req contain login user
+        let chats=Chat.find({ users: { $elemMatch: { $eq: req.user._id } } })
+            .populate("users", "-password")         // Populate users field excluding passwords
+            .populate("groupAdmin", "-password")    // Populate groupAdmin field (if applicable)
+            .populate("latestMessage")              // Populate latestMessage field
+            .sort({ updatedAt: -1 });               // Sort by most recent
+
+        // Populate the sender in the latestMessage
+        chats = await User.populate(chats, {
             path: "latestMessage.sender",
             select: "name pic email",
-          });
-          res.status(200).send(results);
         });
+        res.status(200).send(chats);
+        // Send the chats document as the response
     } catch (error) {
-      res.status(400);
-      throw new Error(error.message);
+        console.error("Error fetching chats:", error); // Log the error for debugging
+        res.status(400).send({ message: error.message });
+
     }
-  });
-  
+    });
+      
 
 
+const createGroupChat=asyncHandler(async(req,res)=>{
+    if(!req.body.users||!req.body.name){
+        return res.status(400).send({message: "please fill all fields"});
+    }
+    //from frontend details will go in stringify format in backend it will parse to amke object
+    var users=JSON.parse(req.body.users);
 
-// const fetchChats = asyncHandler(async (req, res) => {
-//     try {
-//         // Fetch all chats where this user is involved
-//         Chat.find({ users: { $elemMatch: { $eq: req.user._id } } })
-//             .populate("users", "-password")         // Populate users field excluding passwords
-//             .populate("groupAdmin", "-password")    // Populate groupAdmin field (if applicable)
-//             .populate("latestMessage")              // Populate latestMessage field
-//             .sort({ updatedAt: -1 });               // Sort by most recent
+    if(users.length < 2){
+        return res
+        .status(400)
+        .send("More than 2 users are required ")
+    }
 
-//         // Populate the sender in the latestMessage
-//         chats = await User.populate(chats, {
-//             path: "latestMessage.sender",
-//             select: "name pic email",
-//         });
+    //pushing currentlu login user as well
+    users.push(req.user);
+    try{
+        const groupChat=await Chat.create({
+            chatName:req.body.name,
+            // this is array
+            users:users,
+            isGroupChat:true,
+            groupAdmin:req.user
+        });
 
-//         // Send the chats document as the response
-//         res.status(200).send(chats);
-//     } catch (error) {
-//         console.error("Error fetching chats:", error); // Log the error for debugging
-//         res.status(400).send({ message: error.message });
-//     }
-// });
+        const fullGroupChat=await Chat.findOne({_id:groupChat._id})
+        .populate("users","-password")
+        .populate("groupAdmin","-password")
+        res.status(200).json(fullGroupChat);
+        }catch(error){
+        res.status(400);
+        throw new Error(error.message);
+    }
+
+})
+
+const renameGroup=asyncHandler(async(req,res)=>{
+    const { chatId,chatName }=req.body;
+
+    const updatedChat=await Chat.findByIdAndUpdate(
+        chatId,
+        {
+            //if key value same like below we can write chatName
+            chatName:chatName,
+        },
+        {
+            new:true,
+        }
+    )
+        .populate("users","-password")
+        .populate("groupAdmin","-password");
+
+        if(!updatedChat){
+            res.status(404);
+            throw new Error("chat not found")
+        }
+        else{
+            res.json(updatedChat);
+        }
+});
+
+const addToGroup=asyncHandler( async(req,res)=>{
+    const { chatId,userId } =req.body;
+
+    const added=await Chat.findByIdAndUpdate(chatId,{
+        $push:{users:userId},
+    },
+    {new:true}
+ )
+  .populate("users","-password")
+  .populate("groupAdmin","-password")
+
+  if(!added){
+    res.status(404);
+    throw new Error("Chat Not Found")
+  }
+  else{
+    res.json(added);
+  }
 
 
+});
 
-// const createGroupChat=asyncHandler(async(req,res)=>{
-//     if(!req.body.users||!req.body.name){
-//         return res.status(400).send({message: "please fill all fields"});
-//     }
-//     var users=JSON.parse(req.body.users);
+const removeFromGroup=asyncHandler(async (req,res)=>{
+    const {chatId,userId}=req.body;
 
-//     if(users.length < 2){
-//         return res
-//         .status(400)
-//         .send("More than 2 users are required ")
-//     }
-// })
+    const removed=await Chat.findByIdAndUpdate(
+        chatId,
+        {
+            $pull:{users:userId}
+        },
+        {new:true}
+    )
+    .populate("users","-password")
+    .populate("groupAdmin","-password")
 
-//module.exports = { accessChat, fetchChats ,createGroupChat };
-module.exports = { accessChat, fetchChats};
+    if(!removed){
+        res.status(404);
+        throw new Error("Chat Not Found")
+    }
+    else{
+        res.json(removed);
+    }
+
+})
+
+
+module.exports = { accessChat, fetchChats ,createGroupChat, renameGroup,addToGroup,removeFromGroup};
+//module.exports = { accessChat, fetchChats};
 
