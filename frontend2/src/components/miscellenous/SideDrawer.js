@@ -1,12 +1,12 @@
 import { position, Tooltip } from '@chakra-ui/react';
-import { Box ,Text } from '@chakra-ui/layout';
+import { Box, Text } from '@chakra-ui/react';
 import { Button } from '@chakra-ui/button';
 import axios from 'axios';
 import React,{useState ,useEffect} from 'react'
 // import { Toast } from '@chakra-ui/react';
 import { Avatar, AvatarBadge, AvatarGroup } from '@chakra-ui/react'
 import { BellIcon, ChevronDownIcon } from '@chakra-ui/icons'
-import { getSender } from '../../config/ChatLogics';/////
+import { getSender } from '../../config/ChatLogics';
 import {
     Menu,
     MenuButton,

@@ -46,7 +46,7 @@ const ChatBot = () => {
 
     try {
       const response = await axios.post(
-        '${process.env.REACT_APP_FLASK_BASE_URL}/api/chat',
+        `${process.env.REACT_APP_FLASK_BASE_URL}/api/chat/b`,
         { session_id: sessionId, message: userInput },
         { headers: { "Content-Type": "application/json" } }
       );
