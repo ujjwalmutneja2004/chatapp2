@@ -22,7 +22,7 @@ html, body {
   margin: 0;
   padding: 0;
   height: auto;
-  overflow-y: hidden;
+  /* overflow-y: hidden; */
 }
 
 #root {
@@ -35,6 +35,7 @@ html, body {
     background-image: url("../back.jpg") ;
     background-size:cover;
     background-position: center;
+    overflow-y: hidden;
     
 }
 

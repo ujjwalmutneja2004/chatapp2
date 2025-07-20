@@ -201,7 +201,7 @@ const SideDrawer=()=>{
             <BellIcon fontSize="2xl" m={1}/>
             </MenuButton>
 
-             <MenuList pl={2}>
+  <MenuList pl={2} zIndex={9999} position="absolute" background="white">
   {!notification.length ? (
     'No New Message'
   ) : (
