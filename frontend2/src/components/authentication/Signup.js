@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { VStack, FormControl, FormLabel, Input, InputGroup, InputRightElement, Button, position } from '@chakra-ui/react';
 import { useToast } from '@chakra-ui/react';
@@ -103,8 +102,17 @@ const Signup = () => {
           "Content-type": "application/json",
         },
       };
+
+      //We pass config as the third argument in axios.post to set custom options for the request, such as headers.
+//In your code, config sets the Content-type header to "application/json":
+
+
       /////////////////////////main api
-      const { data } = await axios.post("http://localhost:5000/api/user", { name, email, password, pic }, config);
+      const { data } = await axios.post(
+        `${process.env.REACT_APP_BASE_URL}/api/user`,
+        { name, email, password, pic },
+        config
+      );
     //  console.log("Response Data:", data);
       toast({
         title: "Registration Succesfull",

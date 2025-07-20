@@ -20,7 +20,13 @@ import { ChatState } from '../../Context/ChatProvider';
 import UserBadgeItem from '../UserAvatar/UserBadgeItem';
 import axios from 'axios';
 
-const UpdatedGroupChatModal = ({ fetchAgain, setFetchAgain ,fetchmessages}) => {
+const UpdatedGroupChatModal = ({ fetchAgain, setFetchAgain ,fetchMessages}) => {
+
+  console.log("fetchmessages value:", fetchMessages);
+console.log("typeof fetchmessages:", typeof fetchMessages);
+  
+
+  const { SelectedChat, setSelectedChat, user } = ChatState();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [groupChatName, setGroupChatName] = useState('');
   const [search, setSearch] = useState('');
@@ -60,7 +66,9 @@ const UpdatedGroupChatModal = ({ fetchAgain, setFetchAgain ,fetchmessages}) => {
           },
   
         };
-        const{data} = await axios.put('http://localhost:5000/api/chat/groupadd', {
+        const { data } = await axios.put(
+  `${process.env.REACT_APP_BASE_URL}/api/chat/groupadd`,
+  {
           chatId: SelectedChat._id,
           userId: user1._id,
         }, config);
@@ -96,7 +104,9 @@ const UpdatedGroupChatModal = ({ fetchAgain, setFetchAgain ,fetchmessages}) => {
         },
       };
 
-      const { data } = await axios.put('http://localhost:5000/api/chat/rename', {
+      const { data } = await axios.put(
+  `${process.env.REACT_APP_BASE_URL}/api/chat/rename`,
+  {
         chatId: SelectedChat._id,
         chatName: groupChatName,
       }, config);
@@ -142,7 +152,10 @@ const UpdatedGroupChatModal = ({ fetchAgain, setFetchAgain ,fetchmessages}) => {
         },
       };
 
-      const { data } = await axios.get(`http://localhost:5000/api/user?search=${search}`, config);
+     const { data } = await axios.get(
+  `${process.env.REACT_APP_BASE_URL}/api/user?search=${search}`,
+  config
+);
       setSearchResult(data);
       setLoading(false);
     } catch (error) {
@@ -157,75 +170,95 @@ const UpdatedGroupChatModal = ({ fetchAgain, setFetchAgain ,fetchmessages}) => {
       setLoading(false);
     }
   };
-
+     
+  //user is logged in user and user1 user is the user who is trying to remove
   const handleRemove = async (user1) => {
-    // Ensure only the group admin or the user themselves can remove a user
-    //user1 is logged in user and if user who is trying to remove is not logged in or he is nota adminu ser don't allow him 
-    if (SelectedChat.groupAdmin._id !== user._id && user1._id !== user._id) {
-      toast({
-        title: "Only admins can remove users",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom",
-      });
-      return;
-    }
-  
-    try {
-      setLoading(true); // Show loading indicator
-      const config = {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      };
-  
-      // API call to remove the user from the group
-      const { data } = await axios.put(
-        'http://localhost:5000/api/chat/groupremove',
-        {
-          chatId: SelectedChat._id,
-          userId: user1._id,
-        },
-        config
-      );
-  
-      // Update the chat UI after removing the user
-      if (user1._id === user._id) {
-        setSelectedChat(); // If the current user removed themselves, clear the selected chat
-      } else {
-        setSelectedChat(data); // Otherwise, update the selected chat with the new group details
-      }
-       
-    fetchmessages();
-      setFetchAgain(!fetchAgain); // Trigger UI update elsewhere if necessary
+  // Admin cannot remove themselves
+  if (user._id === user1._id && user._id === SelectedChat.groupAdmin._id) {
+    toast({
+      title: "Admin cannot remove themselves",
+      status: "error",
+      duration: 5000,
+      isClosable: true,
+      position: "bottom",
+    });
+    return;
+  }
+
+  // Only admin can remove others
+  if (user._id !== user1._id && user._id !== SelectedChat.groupAdmin._id) {
+    toast({
+      title: "Only admins can remove other users",
+      status: "error",
+      duration: 5000,
+      isClosable: true,
+      position: "bottom",
+    });
+    return;
+  }
+
+  try {
+    setLoading(true);
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${user.token}`,
+      },
+    };
+
+    const { data } = await axios.put(
+      `${process.env.REACT_APP_BASE_URL}/api/chat/groupremove`,
+      {
+        chatId: SelectedChat._id,
+        userId: user1._id,
+      },
+      config
+    );
+
+    // Update selected chat
+    // if (user1._id === user._id) {
+    //   setSelectedChat(); // user left the group
+    // } else {
+    //   setSelectedChat(data); // admin removed another user
+    // }
+
+    // // Optional: refetch messages if still in the chat
+    // if (user1._id !== user._id) {
+    //   fetchmessages();
+    // }
+
+    // setFetchAgain(!fetchAgain); // refresh parent component
+      user1._id === user._id ? setSelectedChat() : setSelectedChat(data);
+      setFetchAgain(!fetchAgain);
+      fetchMessages();
       setLoading(false);
-  
-      toast({
-        title: "User removed successfully!",
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom",
-      });
-    } catch (error) {
-      console.log(error)
-      toast({
-        title: "Error Occurred!",
-        description: error.response?.data?.message || "Failed to remove the user",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom",
-      });
-      setLoading(false);
-    }
-  };
+    toast({
+      title:
+        user1._id === user._id
+          ? "You left the group"
+          : "User removed successfully!",
+      status: "success",
+      duration: 5000,
+      isClosable: true,
+      position: "bottom",
+    });
+  } catch (error) {
+    console.error("Remove Error:", error);
+    toast({
+      title: "Error Occurred!",
+      description:
+        error.response?.data?.message || "Failed to remove the user",
+      status: "error",
+      duration: 5000,
+      isClosable: true,
+      position: "bottom",
+    });
+  } finally {
+    setLoading(false); // Always stop loading
+  }
+};
 
 
-
-
-  const { SelectedChat, setSelectedChat, user } = ChatState();
 
   return (
     <>

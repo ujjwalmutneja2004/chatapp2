@@ -52,8 +52,8 @@ const ScrollableChat = ({ messages }) => {
    // console.log("Rendering ScrollableChat with messages: ", messages); // Add a log
 
     return (
-      <div style={{ overflow: 'auto', maxHeight: '400px'}}>
-
+      // <div style={{ overflow: 'auto', maxHeight: '400px'}}>
+       <div className="messages">
         {messages && messages.map((m, i) => (
           <div style={{ display: "flex" }} key={i}>
             {(isSameSender(messages, m, i, user._id) || isLastMessage(messages, m, i, user._id)) && (
@@ -73,10 +73,11 @@ const ScrollableChat = ({ messages }) => {
             <span style={{
               backgroundColor: `${m.sender._id === user._id ? "#BEE3F8" : "#B9F5D0"}`,
               borderRadius: "20px",
-              padding: "5px 15px",
-              maxWidth: "75%",
+              padding: "8px 18px", // More padding
+               maxWidth: "85%",   
               marginLeft:isSameSenderMargin(messages,m,i,user._id),
-              marginTop:isSameUser(messages,m,i,user._id)?3:10
+              marginTop:isSameUser(messages,m,i,user._id)?3:10,
+              marginRight: m.sender._id === user._id ? 10 : 0, // Space from right edge for sent
 
             }}>
               {m.content}

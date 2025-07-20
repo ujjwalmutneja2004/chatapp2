@@ -1,4 +1,4 @@
- import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChatState } from '../../Context/ChatProvider';
 import { Text, Box, IconButton, Spinner, FormControl, Input } from '@chakra-ui/react';
 import { ArrowBackIcon } from '@chakra-ui/icons';
@@ -23,7 +23,7 @@ const defaultOptions ={
 
 
 
-const ENDPOINT = 'http://localhost:5000';
+const ENDPOINT = process.env.REACT_APP_BASE_URL;
 var  selectedChatCompare;
 let socket=io();
 
@@ -52,7 +52,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
       setLoading(true);
       const { data } = await axios.get(
-        `http://localhost:5000/api/message/${SelectedChat._id}`,
+        `${process.env.REACT_APP_BASE_URL}/api/message/${SelectedChat._id}`,
         config
       );
 
@@ -104,7 +104,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
          //change 
         setNewMessage("");
         const { data } = await axios.post(
-          'http://localhost:5000/api/message',
+          `${process.env.REACT_APP_BASE_URL}/api/message`,
           {
             content: newMessage,
             chatId: SelectedChat._id,
@@ -227,8 +227,8 @@ useEffect(()=>{
               </>
             ) : (
               <>
-                {SelectedChat.chatName.toUpperCase()}
-                <UpdatedGroupChatModal fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} />
+                { SelectedChat.chatName.toUpperCase()}
+                <UpdatedGroupChatModal fetchMessages={fetchMessages} fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} />
               </>
             )}
           </Text>
@@ -241,15 +241,22 @@ useEffect(()=>{
             bg="#E8E8E8"
             w="98%"
             mt={2}
-            h="90%"
+            height="calc(100vh - 120px)"
             borderRadius="lg"
-            overflowY="hidden"
+            overflow="hidden"
           >
+              <Box
+    flex="1"
+    overflowY="auto"
+    mb={2}
+    minH={0} 
+  >
             {loading ? (
               <Spinner size="xl" w={20} h={20} alignSelf="center" margin="auto" />
             ) : (
               <ScrollableChat messages={messages} />
             )}
+            </Box>
 
             <FormControl onKeyDown={sendMessage} isRequired mt={3}>
               {/* {isTyping?<div>Loading....</div>:<></>} */}

@@ -1,3 +1,10 @@
-.env
-node_modules
-!frontend/
+# Node modules
+**/node_modules/
+
+# Env files
+backend/.env
+frontend2/.env
+
+# Log files
+**/*.log
+

@@ -78,7 +78,10 @@ const SideDrawer=()=>{
           },    
       };
 
-      const {data}=await axios.post("http://localhost:5000/api/chat",{userId}, config);
+      const { data } = await axios.post(
+    `${process.env.REACT_APP_BASE_URL}/api/chat`,
+    { userId },
+    config);
     //  console.log(data);
 
       //if we found old chats append it
@@ -130,7 +133,11 @@ const SideDrawer=()=>{
           },
         };
         // console.log(`Requesting: http://localhost:5000/api/user?search=${search}`);
-        const { data } = await axios.get(`http://localhost:5000/api/user?search=${search}`, config);
+       const { data } = await axios.get(
+  `${process.env.REACT_APP_BASE_URL}/api/user?search=${search}`,
+  config
+);
+
        // console.log(data);
         setLoading(false);
         setSearchResult(data);
@@ -214,55 +221,27 @@ const SideDrawer=()=>{
   )}
 </MenuList>
    
- 
-{/* 
-  console.log("Notifications: ", notification); */}
-  {/* <MenuList pl={2}>
-  {(!notification || notification.length === 0) ? (
-    'No New Message'
-  ) : (
-    notification.map((notif) => {
-      console.log("Notification:", notif);  // Logs each notification
-      if (notif && notif.chat) {
-        console.log("Chat in notification: ", notif.chat);  // Logs the chat object inside the notification
-      }
-      return (
-        notif && notif.chat ? (
-          <MenuItem
-            key={notif._id}
-            onClick={() => {
-              setSelectedChat(notif.chat);
-              setNotification(notification.filter((n) => n !== notif));
-            }}
-          >
-            {notif.chat.isGroupChat
-              ? `New Message in ${notif.chat.chatName}`
-              : `New Message from ${getSender(user, notif.chat.users)}`}
-          </MenuItem>
-        ) : null
-      );
-    })
-  )}
-</MenuList> */}
-
-
-            
 
             
           </Menu>
-          <Menu>  
-          <MenuButton as={Button} rightIcon={<ChevronDownIcon/>}>
-          {/* //fetching this from  chatstate in usecontext*/}
-             <Avatar size='sm' cursor='pointer' name={user.name} src={user.pic}/>
-           </MenuButton>
-           
-           <MenuList>
-            <ProfileModal user={user}>
-            <MenuItem> My Profile</MenuItem>
-            </ProfileModal >
-            <MenuItem onClick={logoutHandler}> Log Out </MenuItem>
-           </MenuList>
-          </Menu>
+         <Menu>
+  <MenuButton as={Button} rightIcon={<ChevronDownIcon />} bg="transparent" _hover={{ bg: "gray.100" }}>
+    <Avatar size="sm" cursor="pointer" name={user.name} src={user.pic} />
+  </MenuButton>
+
+  <MenuList zIndex={9999} position="absolute">
+    <ProfileModal user={user}>
+      <MenuItem>My Profile</MenuItem>
+    </ProfileModal>
+    <MenuItem onClick={logoutHandler}>Log Out</MenuItem>
+  </MenuList>
+</Menu>
+
+
+
+
+
+
         </div>
 
         <Drawer placement="left" onClose={ onClose } isOpen={ isOpen }>

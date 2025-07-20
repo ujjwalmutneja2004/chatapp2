@@ -73,17 +73,14 @@ const Chatpage = () => {
    return <div style={{width:"100%"}}>
     {user && <SideDrawer/>}
     <Box
-     display="flex" 
-     justifyContent="space-between"
-     width="100%" 
-     height="91.5vh" 
-    // padding="10px"
-    ml={0}
-    pb="5px"
-    // mb={0}
-    //  margin:"5px"
-   // position={{ md:"absolute",sm: "relative" }}
-    >
+  position="relative"
+  display="flex"
+  flexDirection={{ base: "column", md: "row" }}
+  width="100%"
+  height="100vh" // or your preferred height
+  ml={0}
+  pb="5px"
+>
       {user && (
          <MyChats fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} />)}
       {user && (

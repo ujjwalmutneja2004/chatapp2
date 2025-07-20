@@ -17,11 +17,11 @@ const ChatBot = () => {
   useEffect(() => {
     const initializeSession = async () => {
       try {
-        const response = await axios.post("http://127.0.0.1:5000/api/init");
+        const response = await axios.post(`${process.env.REACT_APP_FLASK_BASE_URL}/api/init`);
         setSessionId(response.data.session_id); // Save session ID from backend
         setMessages([{ text: response.data.message, from: "bot" }]);
       } catch (error) {
-        console.error("Error initializing chat session:", error.message);
+        console.error("Error initializing chat6 session:", error.message);
       }
     };
 
@@ -46,7 +46,7 @@ const ChatBot = () => {
 
     try {
       const response = await axios.post(
-        "http://127.0.0.1:5000/api/chat/b",
+        '${process.env.REACT_APP_FLASK_BASE_URL}/api/chat',
         { session_id: sessionId, message: userInput },
         { headers: { "Content-Type": "application/json" } }
       );

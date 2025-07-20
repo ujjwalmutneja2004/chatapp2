@@ -23,6 +23,45 @@ const Login = () => {
   const history = useHistory();
   const handleClick = () => setShow(!show);
 
+  const handleGuestLogin = async () => {
+  const random = Math.floor(Math.random() * 1000000);
+  const guestEmail = `guest${random}@example.com`;
+  const guestPassword = `guest${random}`;
+  const guestName = `Guest${random}`;
+
+  try {
+    // Register the guest user
+    await axios.post(
+      `${process.env.REACT_APP_BASE_URL}/api/user`,
+      { name: guestName, email: guestEmail, password: guestPassword }
+    );
+    // Login the guest user
+    const { data } = await axios.post(
+      `${process.env.REACT_APP_BASE_URL}/api/user/login`,
+      { email: guestEmail, password: guestPassword }
+    );
+    toast({
+      title: "Guest Login Successful",
+      status: "success",
+      duration: 5000,
+      isClosable: true,
+      position: "bottom",
+    });
+    localStorage.setItem('userInfo', JSON.stringify(data));
+    localStorage.setItem('authToken', data.token);
+    history.push('/chats');
+  } catch (error) {
+    toast({
+      title: "Error Occurred",
+      description: error.response?.data?.message || error.message,
+      status: "error",
+      duration: 5000,
+      isClosable: true,
+      position: "bottom",
+    });
+  }
+};
+
 
   const submitHandler = async () => {
     setLoading(true);
@@ -48,9 +87,9 @@ const Login = () => {
        ////The function uses axios.post to send an HTTP POST request to the server at http://localhost:5000/api/user/login.
       ///The request body contains the email and password that the user entered.
       const { data } = await axios.post(
-        "http://localhost:5000/api/user/login",
+        `${process.env.REACT_APP_BASE_URL}/api/user/login`,
         { email, password },
-       // The config object is passed along with the request to ensure that the server understands the content type.
+        // The config object is passed along with the request to ensure that the server understands the content type.
         config
       );
      
@@ -120,11 +159,14 @@ const Login = () => {
         color='white'
         width="100%"
         onClick={() => {
-          setEmail("guest@example.com");
-          setPassword("123456");
+          // setEmail("guest@example.com");
+          // setPassword("123456");
+          
         }
-        }
-      >Get Guest User Credentials
+        }>
+         {/* onClick={handleGuestLogin}> */}
+   
+      Get Guest User Credentials
 
       </Button>
     </VStack>

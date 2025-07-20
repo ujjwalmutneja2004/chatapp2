@@ -1,13 +1,43 @@
 @import url('https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap');
 
-.App{
+/* .App{
     min-height:100vh;
     display:flex;
+   
+    background-size:cover;
+    background-position: center;
+    
+} */
+
+/* html, body, #root, .App {
+    height: 100vh;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    overflow: hidden; /* Prevent page scroll 
+} */
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: auto;
+  overflow-y: auto;
+}
+
+#root {
+  height: auto;
+}
+
+.App {
+  height: auto;
+  min-height: 100vh;
     background-image: url("../back.jpg") ;
     background-size:cover;
     background-position: center;
     
 }
+
 
 
 ::-webkit-scrollbar{
