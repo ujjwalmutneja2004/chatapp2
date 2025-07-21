@@ -186,18 +186,13 @@ const SideDrawer=()=>{
         </Text>
 
 
-        <div>
+      <div>
           <Menu>
             <MenuButton p={1}>
-
-          
               <NotificationBadge          
               count = {notification.length}
               effect={Effect.SCALE}
               />                          
-
-
-
             <BellIcon fontSize="2xl" m={1}/>
             </MenuButton>
 
@@ -237,12 +232,9 @@ const SideDrawer=()=>{
   </MenuList>
 </Menu>
 
-
-
-
-
-
         </div>
+
+
 
         <Drawer placement="left" onClose={ onClose } isOpen={ isOpen }>
           <DrawerOverlay/>
@@ -270,6 +262,7 @@ const SideDrawer=()=>{
                 <UserListItem
                 key={user._id}
                 user={user}
+                //handleFunction ek custom prop hai jo tumne UserListItem component ko diya hai.
                 handleFunction={()=>accessChat(user._id)}
                 />
               ))

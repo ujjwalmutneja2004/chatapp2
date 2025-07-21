@@ -159,7 +159,7 @@ const Signup = () => {
           />
           <InputRightElement width="4.5rem">
             <Button h="1.75rem" size="sm" onClick={handleClick}>
-              {show ? "Hide" : "Show"}
+              {show ? "Show":"Hide" }
             </Button>
           </InputRightElement>
         </InputGroup>

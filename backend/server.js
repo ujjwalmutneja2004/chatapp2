@@ -14,7 +14,8 @@ dotenv.config();
 connectDB();
 const app = express();
 app.use(cors({
-  origin: "https://chatapp2-8nrb.vercel.app",
+//   origin: "https://chatapp2-8nrb.vercel.app",
+    origin: "http://localhost:3000", // 🔥 no trailing slash
   credentials: true
 }));
 app.use(express.json());
@@ -49,7 +50,8 @@ const server=app.listen(PORT, console.log(`Server started on port ${PORT}`));
 const io = require('socket.io')(server, {
   pingTimeout: 60000,
   cors: {
-    origin: "https://chatapp2-8nrb.vercel.app", // 🔥 no trailing slash
+    // origin: "https://chatapp2-8nrb.vercel.app", // 🔥 no trailing slash
+    origin: "http://localhost:3000", // 🔥 no trailing slash
     methods: ["GET", "POST"],
     credentials: true
   }
@@ -65,6 +67,19 @@ io.on("connection",(socket)=>{
         console.log(userData._id);
         socket.emit('connected')
     })
+
+//     | Line                        | Action                                                                                   | What it means                                                                            |
+// | --------------------------- | ---------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+// | `socket.on('setup', ...)`   | Waits for the frontend to emit a `'setup'` event                                         | This is triggered by the frontend when a user connects after login.                      |
+// | `socket.join(userData._id)` | Adds the current user's socket to a **private room** with their own user ID as room name | This room allows the backend to send messages **only** to this specific user.            |
+// | `socket.emit('connected')`  | Sends back a `'connected'` event to the same socket (user) that just joined              | Used to notify the frontend that the setup is complete and the connection is successful. |
+
+
+
+
+
+
+
 
     //when we click on chat it should make room with curren user and when other user joins it is going to add other user in this room
     socket.on('join chat',(room)=>{

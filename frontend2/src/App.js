@@ -35,6 +35,7 @@ function App() {
   const isHomePage = location.pathname === "/";
 
   return (
+    //this is for css 
     <div className={isHomePage ? "" : "App"}>
       {/* Routes */}
       <Route path="/" component={HomePag} exact />
