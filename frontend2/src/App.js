@@ -23,6 +23,7 @@ import { Route, useLocation } from "react-router-dom";
 import Homepage from './pages/Homepage';
 import Chatpage from './pages/Chatpage';
 import HomePag from "./Homed";
+import ProtectedRoute from "./components/ProtectedRoute"; // import the wrapper
 import './index.css';
 import './App.css';
 
@@ -38,7 +39,7 @@ function App() {
       {/* Routes */}
       <Route path="/" component={HomePag} exact />
       <Route path="/Hom" component={Homepage} exact /> 
-      <Route path="/chats" component={Chatpage} />
+      <ProtectedRoute Route path="/chats" component={Chatpage} />
     </div>
   );
 }
