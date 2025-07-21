@@ -13,7 +13,10 @@ const messageRoutes=require("./routes/messageRoutes");
 dotenv.config();
 connectDB();
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: "https://chatapp2-8nrb.vercel.app",
+  credentials: true
+}));
 app.use(express.json());
 
 
