@@ -101,7 +101,7 @@ const Login = () => {
         position: "bottom",
         });
      // console.log(data);
-      localStorage.setItem('userInfo', JSON.stringify(data));
+      // localStorage.setItem('userInfo', JSON.stringify(data));
       localStorage.setItem('authToken', data.token); // Store the token
       setLoading(false);
       history.push('/chats')
@@ -137,7 +137,7 @@ const Login = () => {
           />
           <InputRightElement width="4.5rem">
             <Button h="1.75rem" size="sm" onClick={handleClick}>
-              {show ? "Hide" : "Show"}
+              {show ? "Show":"Hide" }
             </Button>
           </InputRightElement>
         </InputGroup>
@@ -158,14 +158,14 @@ const Login = () => {
         backgroundColor='red'
         color='white'
         width="100%"
-        onClick={() => {
-          // setEmail("guest@example.com");
-          // setPassword("123456");
+        // onClick={() => {
+        //   // setEmail("guest@example.com");
+        //   // setPassword("123456");
           
-        }
-        }>
-         {/* onClick={handleGuestLogin}> */}
-   
+        // }
+        // }>
+        onClick={handleGuestLogin}>
+          
       Get Guest User Credentials
 
       </Button>
