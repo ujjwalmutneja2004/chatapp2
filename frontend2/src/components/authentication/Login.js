@@ -101,7 +101,7 @@ const Login = () => {
         position: "bottom",
         });
      // console.log(data);
-      // localStorage.setItem('userInfo', JSON.stringify(data));
+      localStorage.setItem('userInfo', JSON.stringify(data));
       localStorage.setItem('authToken', data.token); // Store the token
       setLoading(false);
       history.push('/chats')
