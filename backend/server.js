@@ -43,12 +43,15 @@ const PORT = process.env.PORT || 5000;
 const server=app.listen(PORT, console.log(`Server started on port ${PORT}`));
 
 //the time it will wait while being inactive
-const io=require('socket.io')(server,{
-    pingTimeout:60000,
-    cors:{
-        origin:"https://chatapp2-8nrb.vercel.app/",
-    },
-})
+const io = require('socket.io')(server, {
+  pingTimeout: 60000,
+  cors: {
+    origin: "https://chatapp2-8nrb.vercel.app", // 🔥 no trailing slash
+    methods: ["GET", "POST"],
+    credentials: true
+  }
+});
+
 
 io.on("connection",(socket)=>{
     console.log("connected to socket.io", socket.id);
